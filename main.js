@@ -22,6 +22,9 @@ function initialize() {
     });
 
     var areas = [];
+    var today = new Date().getTime();
+    var days = 78400000*30;
+
     cunli.forEach(function (value) {
         var key = value.getProperty('VILLAGE_ID'),
                 countyId = value.getProperty('COUNTY_ID'),
@@ -30,7 +33,11 @@ function initialize() {
 		
         if (DengueTW[key]) {
             DengueTW[key].forEach(function (val) {
+                var recdate = new Date(val[0]).getTime();
+		if( today - recdate < days )
+                {
                 count += val[1];
+                }
             });
         }
 
@@ -224,19 +231,19 @@ function showDateMap(clickedDate, cunli) {
             dd = clickedDate.getDate().toString(),
             clickedDateKey = yyyy + '-' + (mm[1] ? mm : '0' + mm[0]) + '-' + (dd[1] ? dd : '0' + dd[0]);
 
+    var days = 78400000*30;
+
     cunli.forEach(function (value) {
         var key = value.getProperty('VILLAGE_ID'),
                 count = 0;
 
         if (DengueTW[key]) {
             DengueTW[key].forEach(function (val) {
-                var recordDate = new Date(val[0]);
-	        if( recordDate.getMonth() > 5 )
+                var diff = clickedDate.getTime() - new Date(val[0]).getTime();
+		if( diff < days && diff >= 0)
 	        {
-                if (recordDate <= clickedDate) {
                     count += val[1];
-                }
-		}
+      		}
             });
         }
         value.setProperty('num', count);
