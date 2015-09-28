@@ -7,6 +7,7 @@ var map,
 $.getJSON('http://happychang.github.io/fever-data/Dengue.json', function (data) {
     DengueTW = data;
 });
+
 function initialize() {
 
     /*map setting*/
@@ -22,26 +23,11 @@ function initialize() {
     });
 
     var areas = [];
-    var today = new Date().getTime();
-    var days = 78400000*30;
-
     cunli.forEach(function (value) {
         var key = value.getProperty('VILLAGE_ID'),
                 countyId = value.getProperty('COUNTY_ID'),
                 townId = value.getProperty('TOWN_ID'),
                 count = 0;
-		
-        if (DengueTW[key]) {
-            DengueTW[key].forEach(function (val) {
-                var recdate = new Date(val[0]).getTime();
-		if( today - recdate < days )
-                {
-                count += val[1];
-                }
-            });
-        }
-
-        value.setProperty('num', count); 
     
         if(countyId.length === 2) {
             countyId += '000';
@@ -53,6 +39,8 @@ function initialize() {
             areas[townId] = value.getProperty('C_Name') + value.getProperty('T_Name');
         }
     });
+
+    showDateMap(new Date(), cunli);
 
     var totalNum = 0, ignoreNum = 0;
     var block = '下面病例數字未包含村里資訊，因此無法在地圖中顯示：<div class="clearfix"><br /></div>';
@@ -231,19 +219,19 @@ function showDateMap(clickedDate, cunli) {
             dd = clickedDate.getDate().toString(),
             clickedDateKey = yyyy + '-' + (mm[1] ? mm : '0' + mm[0]) + '-' + (dd[1] ? dd : '0' + dd[0]);
 
-    var days = 78400000*30;
-
     cunli.forEach(function (value) {
         var key = value.getProperty('VILLAGE_ID'),
                 count = 0;
 
         if (DengueTW[key]) {
             DengueTW[key].forEach(function (val) {
-                var diff = clickedDate.getTime() - new Date(val[0]).getTime();
-		if( diff < days && diff >= 0)
+                var recordDate = new Date(val[0]);
+	        if( recordDate.getMonth() > 5 )
 	        {
+                if (recordDate <= clickedDate) {
                     count += val[1];
-      		}
+                }
+		}
             });
         }
         value.setProperty('num', count);
